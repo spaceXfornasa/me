@@ -539,6 +539,7 @@ function Chloex:Window(GuiConfig)
     DropShadow.Name = "DropShadow"
     DropShadow.Parent = DropShadowHolder
 
+    local MainRoundedBackground = nil
     if GuiConfig.Theme then
         Main:Destroy()
         Main = Instance.new("ImageLabel")
@@ -547,8 +548,21 @@ function Chloex:Window(GuiConfig)
         Main.BackgroundTransparency = 1
         Main.ImageTransparency = GuiConfig.ThemeTransparency or 0.15
     else
+        -- The black panel is a separate rounded backing surface. Main itself is
+        -- transparent so its square bounds cannot paint over the rounded corners.
         Main.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-        Main.BackgroundTransparency = 0
+        Main.BackgroundTransparency = 1
+
+        MainRoundedBackground = Instance.new("Frame")
+        MainRoundedBackground.Name = "MainRoundedBackground"
+        MainRoundedBackground.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        MainRoundedBackground.BackgroundTransparency = 0
+        MainRoundedBackground.BorderSizePixel = 0
+        MainRoundedBackground.ZIndex = 0
+
+        local MainRoundedCorner = Instance.new("UICorner")
+        MainRoundedCorner.CornerRadius = UDim.new(0, 14)
+        MainRoundedCorner.Parent = MainRoundedBackground
     end
 
     Main.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -557,8 +571,17 @@ function Chloex:Window(GuiConfig)
     Main.Position = UDim2.new(0.5, 0, 0.5, 0)
     Main.Size = UDim2.new(1, -47, 1, -47)
     Main.Name = "Main"
+    Main.ZIndex = 1
     Main.Parent = DropShadow
 
+    if MainRoundedBackground then
+        MainRoundedBackground.AnchorPoint = Main.AnchorPoint
+        MainRoundedBackground.Position = Main.Position
+        MainRoundedBackground.Size = Main.Size
+        MainRoundedBackground.Parent = DropShadow
+    end
+
+    UICorner.CornerRadius = UDim.new(0, 14)
     UICorner.Parent = Main
 
     Top.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
@@ -766,39 +789,25 @@ function Chloex:Window(GuiConfig)
         Overlay.ZIndex = 50
         Overlay.Parent = DropShadowHolder
 
-        local Dialog = Instance.new("ImageLabel")
+        local Dialog = Instance.new("Frame")
         Dialog.Size = UDim2.new(0, 300, 0, 150)
         Dialog.Position = UDim2.new(0.5, -150, 0.5, -75)
-        Dialog.Image = "rbxassetid://9542022979"
-        Dialog.ImageTransparency = 0
+        Dialog.BackgroundColor3 = Color3.fromRGB(8, 8, 8)
+        Dialog.BackgroundTransparency = 0
         Dialog.BorderSizePixel = 0
         Dialog.ZIndex = 51
+        Dialog.ClipsDescendants = true
         Dialog.Parent = Overlay
-        local UICorner = Instance.new("UICorner", Dialog)
-        UICorner.CornerRadius = UDim.new(0, 8)
 
-        local DialogGlow = Instance.new("Frame")
-        DialogGlow.Size = UDim2.new(0, 310, 0, 160)
-        DialogGlow.Position = UDim2.new(0.5, -155, 0.5, -80)
-        DialogGlow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        DialogGlow.BackgroundTransparency = 0.75
-        DialogGlow.BorderSizePixel = 0
-        DialogGlow.ZIndex = 50
-        DialogGlow.Parent = Overlay
+        local UICorner = Instance.new("UICorner")
+        UICorner.CornerRadius = UDim.new(0, 9)
+        UICorner.Parent = Dialog
 
-        local GlowCorner = Instance.new("UICorner", DialogGlow)
-        GlowCorner.CornerRadius = UDim.new(0, 10)
-
-        local Gradient = Instance.new("UIGradient")
-        Gradient.Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0.0, Color3.fromRGB(0, 191, 255)),
-            ColorSequenceKeypoint.new(0.25, Color3.fromRGB(255, 255, 255)),
-            ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 140, 255)),
-            ColorSequenceKeypoint.new(0.75, Color3.fromRGB(255, 255, 255)),
-            ColorSequenceKeypoint.new(1.0, Color3.fromRGB(0, 191, 255))
-        })
-        Gradient.Rotation = 90
-        Gradient.Parent = DialogGlow
+        local DialogStroke = Instance.new("UIStroke")
+        DialogStroke.Color = Color3.fromRGB(58, 58, 58)
+        DialogStroke.Thickness = 1
+        DialogStroke.Transparency = 0.15
+        DialogStroke.Parent = Dialog
 
         local Title = Instance.new("TextLabel")
         Title.Size = UDim2.new(1, 0, 0, 40)
@@ -826,8 +835,8 @@ function Chloex:Window(GuiConfig)
         local Yes = Instance.new("TextButton")
         Yes.Size = UDim2.new(0.45, -10, 0, 35)
         Yes.Position = UDim2.new(0.05, 0, 1, -55)
-        Yes.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        Yes.BackgroundTransparency = 0.935
+        Yes.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
+        Yes.BackgroundTransparency = 0
         Yes.Text = "Yes"
         Yes.Font = Enum.Font.GothamBold
         Yes.TextSize = 15
@@ -841,8 +850,8 @@ function Chloex:Window(GuiConfig)
         local Cancel = Instance.new("TextButton")
         Cancel.Size = UDim2.new(0.45, -10, 0, 35)
         Cancel.Position = UDim2.new(0.5, 10, 1, -55)
-        Cancel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        Cancel.BackgroundTransparency = 0.935
+        Cancel.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
+        Cancel.BackgroundTransparency = 0
         Cancel.Text = "Cancel"
         Cancel.Font = Enum.Font.GothamBold
         Cancel.TextSize = 15
