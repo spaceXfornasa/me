@@ -1270,7 +1270,7 @@ function StealthX:ShowStatus(config)
       TextSize = 12, Font = Enum.Font.GothamMedium, BorderSizePixel = 0,
       AutoButtonColor = true,
     })
-    statusElement("UICorner", action, {CornerRadius = UDim.new(0, 8)})
+    statusElement("UICorner", action, {CornerRadius = UDim.new(0, 50)})
     action.Activated:Connect(function()
       if type(actionConfig.Callback) == "function" then
         local ok, err = pcall(actionConfig.Callback)
@@ -1564,6 +1564,11 @@ function StealthX:CreateLoadingScreen(config)
         TextXAlignment = Enum.TextXAlignment.Left,
         ZIndex = 5,
     })
+    -- Match the progress track's constrained width, not the full viewport.
+    make("UISizeConstraint", stepCounter, {
+        MinSize = Vector2.new(210, 15),
+        MaxSize = Vector2.new(360, 15),
+    })
     local percentLabel = make("TextLabel", root, {
         Name = "Percent",
         AnchorPoint = Vector2.new(0.5, 0),
@@ -1577,6 +1582,10 @@ function StealthX:CreateLoadingScreen(config)
         TextSize = 9,
         TextXAlignment = Enum.TextXAlignment.Right,
         ZIndex = 5,
+    })
+    make("UISizeConstraint", percentLabel, {
+        MinSize = Vector2.new(210, 15),
+        MaxSize = Vector2.new(360, 15),
     })
 
     local controller = {
